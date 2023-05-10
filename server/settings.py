@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app1.apps.App1Config',
+    'corsheaders', # 跨域
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # 跨域中间件
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -80,10 +82,21 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', # 数据库引擎
+        'NAME':'sdmg',                        # 数据库名
+        'USER': 'root',                       # 数据库用户名
+        'PASSWORD': 'mA@12344321',            # 数据库密码
+        # 'HOST': 'localhost',              # 数据库地址
+        'HOST': '101.200.41.83',
+        'PORT': 3306,                         # 数据库端口
     }
 }
 
@@ -128,3 +141,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS_ORIGIN_ALLOW_ALL = True # 允许所有的跨域请求
+# CORS_ALLOW_CREDENTIALS = True # 允许携带cookie的跨域请求
+CORS_ORIGIN_WHITELIST = [ # 允许指定的跨域请求
+    'http://localhost:8000',
+]

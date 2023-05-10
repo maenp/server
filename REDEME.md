@@ -13,7 +13,7 @@ server # 项目的根目录
 
 
 # 2.创建App
-python manage.py startapp [app_name]
+python3 manage.py startapp [app_name]
 
 app1 # 应用的根目录
 - migrations        # 数据库迁移文件      【不用动】
@@ -105,3 +105,70 @@ app1 # 应用的根目录
     - JsonResponse({'name': 'zhangsan'}) # 返回json数据
     - FileResponse(open('1.jpg', 'rb')) # 返回文件
     - StreamingHttpResponse(open('1.jpg', 'rb')) # 返回流文件
+
+# 7.跨域配置
+- 作用：解决前后端分离项目中的跨域问题
+- 使用：
+    - 安装django-cors-headers
+        - pip install django-cors-headers
+    - 在settings.py中配置
+        - INSTALLED_APPS = [
+            ...
+            'corsheaders', # 注册应用
+        ]
+        - MIDDLEWARE = [
+            ...
+            'corsheaders.middleware.CorsMiddleware', # 注册中间件
+        ]
+        - CORS_ORIGIN_ALLOW_ALL = True # 允许所有的跨域请求
+        - CORS_ALLOW_CREDENTIALS = True # 允许携带cookie的跨域请求
+        - CORS_ORIGIN_WHITELIST = [ # 允许指定的跨域请求
+            'http://localhost:8000',
+        ]
+    - 在视图函数中使用@csrf_exempt装饰器 取消csrf验证
+        - from django.views.decorators.csrf import csrf_exempt
+        - @csrf_exempt
+        - def index(request):
+            - return HttpResponse('Hello World!')
+
+# 8.数据库操作
+code -> ORM -> mysqlclient -> 数据库
+- Django 开发操作数据库更简单，内部提供了ORM框架
+    - 安装mysqlclient
+        - pip install mysqlclient
+- ORM：对象关系映射
+    - 将对象和关系进行映射，对象操作数据库，不需要编写sql语句
+    - 优点：
+        - 屏蔽了不同数据库之间的差异，使用起来更方便
+        - 不需要编写sql语句，操作更简单
+        - 可以进行数据库的迁移，不需要关心数据库的细节
+    - 缺点：
+- 连接数据库
+    - 在setting.py中配置数据库信息
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME':'dbname',
+                'USER': 'root',
+                'PASSWORD': 'xxx',
+                'HOST': '101.200.41.83',
+                'PORT': 3306,
+            }
+        }
+    - 在应用的根目录下创建models.py文件
+    - 在models.py文件中创建模型类
+        - from django.db import models
+        - class Book(models.Model):
+            - title = models.CharField(max_length=20)
+            - price = models.FloatField(default=0)
+            - pub_date = models.DateField()
+            - publish = models.CharField(max_length=20)
+            - def __str__(self):
+                - return self.title
+    - 生成迁移文件
+        - python3 manage.py makemigrations
+    - 执行迁移文件
+        - python3 manage.py migrate
+
+
+
