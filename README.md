@@ -166,9 +166,19 @@ code -> ORM -> mysqlclient -> 数据库
             - def __str__(self):
                 - return self.title
     - 生成迁移文件
+        - 先确定当前app已经在settings.py中注册
         - python3 manage.py makemigrations
     - 执行迁移文件
         - python3 manage.py migrate
+    - 下次再次修改模型类，需要重新生成迁移文件和执行迁移文件
+        - python3 manage.py makemigrations
+        - python3 manage.py migrate
+    - 如果修改当前已有的模型，在表中新增列时，由于已存在的数据无法给新增的列赋值，所以需要给新增的列设置默认值
+        - price = models.FloatField(default=0)
+        - 手动输入一个值
+        - 允许为空 price = models.FloatField(null=True, blank=True)
+
+    
 
 
 

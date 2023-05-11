@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app1.apps.App1Config',
+    'user.apps.UserConfig',
     'corsheaders', # 跨域
 ]
 
@@ -94,7 +95,6 @@ DATABASES = {
         'NAME':'sdmg',                        # 数据库名
         'USER': 'root',                       # 数据库用户名
         'PASSWORD': 'mA@12344321',            # 数据库密码
-        # 'HOST': 'localhost',              # 数据库地址
         'HOST': '101.200.41.83',
         'PORT': 3306,                         # 数据库端口
     }
