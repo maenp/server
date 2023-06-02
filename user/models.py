@@ -1,18 +1,22 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
-class UserInfo(models.Model):
-    username = models.CharField(max_length=32)
-    password = models.CharField(max_length=64)
+class UserInfo(AbstractUser):
+    username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
+    password = models.CharField(max_length=128, verbose_name='密码')
+    reqtime = models.DateTimeField(default=timezone.now, verbose_name='注册时间')
 
-    def __str__(self):
-        return self.username
+    # 修改反向访问器的related_name参数
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_set'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_set'
+    )
 
-# """
-# create table user_userinfo(
-#     id int primary key auto_increment,
-#     username varchar(32),
-#     password varchar(64)
-# );
-
-# 相当于执行了上面这条sql语句，创建了一张表，表名为user_userinfo，表中有三个字段，分别为id、username、password。
-# """
+    class Meta:
+        db_table = 'user'         # 指定数据表名
+        verbose_name = '用户表'    # 在admin站点中显示的名称

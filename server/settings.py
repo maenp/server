@@ -146,4 +146,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS_ALLOW_CREDENTIALS = True # 允许携带cookie的跨域请求
 CORS_ORIGIN_WHITELIST = [ # 允许指定的跨域请求
     'http://localhost:8000',
+    'http://localhost:8001',
 ]
