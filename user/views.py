@@ -5,33 +5,34 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate,login,logout
 from user.forms import ReqisterForm
 from user.models import UserInfo
-import django
 
-# 获取 csrftoken、用户信息
+def resolve(data, params={}): # params = dict(status?, msg?)
+    return {
+        'data': data,
+        'status': params['status'] if params.get('status') else 200,
+        'msg': params['msg'] if params.get('msg') else '成功',
+        'success': True,
+    }
+
+def reject( data, params={}):
+    return {
+        'data': data,
+        'status': params['status'] if params.get('status') else 400,
+        'msg': params['msg'] if params.get('msg') else '失败',
+        'success': False,
+    }
+
+# 获取当前的登录的用户信息
 def current(request):
-    token = django.middleware.csrf.get_token(request)
-    return JsonResponse({
-        'status': 200, 
-        'msg': '登录成功', 
-        'data':{
-            'token':token,
-            'username': 'root',
-            'user_id': 1,
-        }
-    })
-
-@csrf_exempt # 取消csrf验证
-def loginIn_(request):
-    if(request.method == 'POST'):
-        body = json.loads(request.body)
-        username = body.get('username')
-        password = body.get('password')
-
-        if username == 'root' and password == '123':
-            token = django.middleware.csrf.get_token(request)
-            return JsonResponse({'status': 200, 'msg': '登录成功', 'data':{'token':token}})
-    return JsonResponse({'status': 400, 'msg': '登录失败~','success':False})
-
+    is_login_status=request.user.is_authenticated # 判断用户是否登录
+    if is_login_status:
+        return JsonResponse(resolve({
+            'status':is_login_status,
+            'username': request.user.username,
+            'id': request.user.id,
+        }))
+    else:
+        return JsonResponse(reject(None, {'msg':'请先登录'}))
 
 @csrf_exempt
 def register(req):
@@ -41,31 +42,37 @@ def register(req):
         if form.is_valid():
             data=form.cleaned_data #获取验证后的数据
             print(data)
-            res=UserInfo.objects.create(**data)    #普通注册到数据库
+            # 判断账号是否已经注册过
+            if UserInfo.objects.filter(username=data['username']).exists():
+                return JsonResponse(reject(None, {'msg':'该账号已经注册过'}))
+
+            # res=UserInfo.objects.create(**data)    #普通注册到数据库
+            res=UserInfo.objects.create_user(**data) #使用django自带的用户注册到数据库
             if res:
-                return JsonResponse({"code":0,"msg":'注册成功'})
-        return JsonResponse({"code":1,"msg":str(form._errors)})
-    return JsonResponse({"code":1,"msg":'请使用post请求！！！'})
+                return JsonResponse(resolve(None, {'msg':'注册成功'}))
+        return JsonResponse(reject(None, {'msg':str(form._errors)}))
+    return JsonResponse(reject(None, {'msg':'请使用post请求！！！'}))
 
 
 @csrf_exempt
 def loginIn(req):
     if req.method=="GET":
-        return JsonResponse({"code":1,"msg":'请使用post请求！！！'})
-    username=req.POST.get("username","")
-    password=req.POST.get("password","")
+        return JsonResponse(reject(None, {'msg':'请使用post请求！！！'}))
+    
+    body = json.loads(req.body)
+    username = body.get('username')
+    password = body.get('password')
 
-    #用户验证 验证成功返回user对象 否则返回none
+    # authenticate 验证账号密码是否正确 返回用户对象 或者 None
     user= authenticate(req,username=username,password=password)
-    print(user,'查找对象')
+    # if not user:
+    #     # 判断账号密码是否正确
+    #     user = UserInfo.objects.filter(username=username, password=password).first()
+
     if user:
-        login(req,user)#记录用户登录状态，参数
-        return JsonResponse({
-            "code":0,
-            "obj":{
-                'username':user.username,
-                'id':user.id
-            },
-            "msg":'登录成功'
-            })
-    return JsonResponse({"code":1,"msg":'登录失败'})
+        login(req,user) # 登录 保存用户的登录状态 保存在session中 
+        return JsonResponse(resolve({
+            'username': user.username,
+            'user_id': user.id,
+        }, {'msg':'登录成功'}))
+    return JsonResponse(reject(None, {'msg':'登录失败！！！'}))

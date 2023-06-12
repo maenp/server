@@ -16,10 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 静态文件目录 
-STATICFILES_DIRS = [ 
-    os.path.join(BASE_DIR, 'static')
-]
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,8 +27,10 @@ SECRET_KEY = 'django-insecure-*1_7l!laac3d-jzs+@u^=3mn(h2*@$j+p_6k&sauf$0nq*02=!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] # 允许所有的域名访问
 
+#指定自定义用户模型所在位置 是为了让Django用户认证系统使用我们自定义的用户模型
+AUTH_USER_MODEL = 'user.UserInfo'
 
 # Application definition
 
@@ -43,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app1.apps.App1Config',
-    'user.apps.UserConfig',
     'corsheaders', # 跨域
+    'app1',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'server.urls'
+ROOT_URLCONF = 'server.urls' # 项目的根路由
 
 TEMPLATES = [
     {
@@ -77,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'server.wsgi.application'
+WSGI_APPLICATION = 'server.wsgi.application' # 项目的wsgi配置 用于部署 一般不用管
 
 
 # Database
@@ -123,28 +121,63 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'  # 这是一个字符串，用于指定语言代码。默认为en-us。
+LANGUAGE_CODE = 'zh-Hans'  # 这是一个字符串，用于指定语言代码。默认为en-us。
 
-TIME_ZONE = 'UTC'        # 这是一个字符串，用于指定时区。如果USE_TZ为真，则此设置为必需，否则它是可选的。如果未设置，则默认为America/Chicago。
+TIME_ZONE = 'Asia/Shanghai'        # 这是一个字符串，用于指定时区。如果USE_TZ为真，则此设置为必需，否则它是可选的。如果未设置，则默认为America/Chicago。
 
 USE_I18N = True          # 这是一个布尔值，用于指定是否使用国际化。如果为真，则Django将使用LOCALE_PATHS设置指定的目录中的翻译。如果为假，则Django将使用当前的语言环境。
-
-USE_TZ = True            # 这是一个布尔值，用于指定是否使用时区。如果为真，则Django将使用TIME_ZONE设置指定的时区，否则Django将使用系统的本地时区。
+USE_L10N = True
+USE_TZ = False            # 这是一个布尔值，用于指定是否使用时区。如果为真，则Django将使用TIME_ZONE设置指定的时区，否则Django将使用系统的本地时区。
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# 静态文件目录 
+STATICFILES_DIRS = [ 
+    os.path.join(BASE_DIR, 'static')
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+#跨域配置·················································· 
+
+CORS_ALLOW_CREDENTIALS = True # 允许携带cookie的跨域请求
 # CORS_ORIGIN_ALLOW_ALL = True # 允许所有的跨域请求
-# CORS_ALLOW_CREDENTIALS = True # 允许携带cookie的跨域请求
 CORS_ORIGIN_WHITELIST = [ # 允许指定的跨域请求
     'http://localhost:8000',
     'http://localhost:8001',
+    "http://127.0.0.1:8001",
 ]
+
+#实际请求所允许的HTTP动词列表。
+CORS_ALLOW_METHODS = (
+	'DELETE',
+	'GET',
+	'OPTIONS',
+	'PATCH',
+	'POST',
+	'PUT',
+	'VIEW',
+)
+
+#发出实际请求时可以使用的非标准HTTP标头的列表。
+CORS_ALLOW_HEADERS = (
+	'XMLHttpRequest',
+	'X_FILENAME',
+	'accept-encoding',
+	'authorization',
+	'content-type',
+	'dnt',
+	'origin',
+	'user-agent',
+	'x-csrftoken',
+	'x-requested-with',
+	'Pragma',
+)
+#··················································

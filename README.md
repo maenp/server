@@ -60,7 +60,7 @@ app1 # 应用的根目录
             - return HttpResponse('Hello World!')
 
 - 启动项目
-    - python manage.py runserver [port:默认8000]
+    - python3 manage.py runserver [port:默认8000]
     - http://localhost:8000/index
 
 # 4.templates 模板
