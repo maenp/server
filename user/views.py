@@ -22,6 +22,14 @@ def reject( data, params={}):
         'success': False,
     }
 
+# 退出登录
+def logoutIn(req):
+    is_login_status=req.user.is_authenticated # 判断用户是否登录
+    if not is_login_status:
+        return JsonResponse(reject(None, {'msg':'当前状态未登录'}))
+    logout(req) # 退出登录
+    return JsonResponse(resolve(None, {'msg':'退出登录成功'}))
+
 # 获取当前的登录的用户信息
 def current(request):
     is_login_status=request.user.is_authenticated # 判断用户是否登录
